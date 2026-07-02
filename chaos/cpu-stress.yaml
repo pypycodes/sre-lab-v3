@@ -1,0 +1,17 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: orders-cpu-stress
+  namespace: sre-lab
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - sre-lab
+    labelSelectors:
+      app: orders-service
+  stressors:
+    cpu:
+      workers: 1
+      load: 80
+  duration: "5m"

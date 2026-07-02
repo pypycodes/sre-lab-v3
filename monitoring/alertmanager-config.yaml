@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: orders-service-alert-routing
+  namespace: monitoring
+  labels:
+    alertmanagerConfig: orders-service
+spec:
+  route:
+    receiver: sre-lab-null-receiver
+    groupBy: ["alertname", "service", "severity"]
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 1h
+  receivers:
+    - name: sre-lab-null-receiver

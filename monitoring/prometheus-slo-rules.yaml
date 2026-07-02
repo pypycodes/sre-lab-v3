@@ -1,0 +1,66 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: orders-service-slo-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: orders-service-sli-recording-rules
+      interval: 30s
+      rules:
+        - record: sli:orders_availability:ratio_rate5m
+          expr: |
+            sum(rate(http_requests_total{namespace="sre-lab", path!="/metrics", status!~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{namespace="sre-lab", path!="/metrics"}[5m]))
+
+        - record: sli:orders_error_rate:ratio_rate5m
+          expr: |
+            sum(rate(http_requests_total{namespace="sre-lab", path!="/metrics", status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{namespace="sre-lab", path!="/metrics"}[5m]))
+
+        - record: sli:orders_latency_p95:rate5m
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum(rate(http_request_duration_seconds_bucket{namespace="sre-lab", path!="/metrics"}[5m])) by (le)
+            )
+
+        - record: slo:orders_availability:burn_rate5m
+          expr: |
+            (1 - sli:orders_availability:ratio_rate5m) / (1 - 0.999)
+
+    - name: orders-service-alerts
+      rules:
+        - alert: OrdersHighErrorRate
+          expr: sli:orders_error_rate:ratio_rate5m > 0.01
+          for: 2m
+          labels:
+            severity: warning
+            service: orders-service
+          annotations:
+            summary: "Orders service high error rate"
+            description: "5xx error rate is above 1% for more than 2 minutes."
+
+        - alert: OrdersHighLatencyP95
+          expr: sli:orders_latency_p95:rate5m > 0.3
+          for: 2m
+          labels:
+            severity: warning
+            service: orders-service
+          annotations:
+            summary: "Orders service high latency"
+            description: "P95 latency is above 300ms for more than 2 minutes."
+
+        - alert: OrdersErrorBudgetFastBurn
+          expr: slo:orders_availability:burn_rate5m > 2
+          for: 2m
+          labels:
+            severity: critical
+            service: orders-service
+          annotations:
+            summary: "Orders service error budget fast burn"
+            description: "Availability error budget is burning more than 2x faster than allowed."
