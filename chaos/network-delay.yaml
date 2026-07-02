@@ -1,0 +1,18 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: orders-network-delay
+  namespace: sre-lab
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces:
+      - sre-lab
+    labelSelectors:
+      app: orders-service
+  delay:
+    latency: "1000ms"
+    correlation: "25"
+    jitter: "100ms"
+  duration: "5m"

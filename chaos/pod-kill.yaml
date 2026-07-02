@@ -1,0 +1,16 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: orders-pod-kill
+  namespace: sre-lab
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces:
+      - sre-lab
+    labelSelectors:
+      app: orders-service
+  duration: "60s"
+  scheduler:
+    cron: "@every 2m"
