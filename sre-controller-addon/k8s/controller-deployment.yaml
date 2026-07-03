@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sreservice-controller
+  namespace: sre-lab
+  labels:
+    app: sreservice-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sreservice-controller
+  template:
+    metadata:
+      labels:
+        app: sreservice-controller
+    spec:
+      serviceAccountName: sreservice-controller
+      containers:
+        - name: controller
+          image: sreservice-controller:v1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: WATCH_NAMESPACE
+              value: "sre-lab"

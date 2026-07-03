@@ -1,0 +1,11 @@
+apiVersion: demo.ct.com/v1
+kind: SREService
+metadata:
+  name: orders
+  namespace: sre-lab
+spec:
+  owner: pavan
+  team: platform-sre
+  availabilitySLO: "99.009999"
+  latencySLO: "10000ms"
+  errorRateSLO: "0.01111"

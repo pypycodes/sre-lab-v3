@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sreservice-controller
+  namespace: sre-lab
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sreservice-controller
+rules:
+  - apiGroups: ["demo.ct.com"]
+    resources: ["sreservices"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["demo.ct.com"]
+    resources: ["sreservices/status"]
+    verbs: ["get", "patch", "update"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sreservice-controller
+subjects:
+  - kind: ServiceAccount
+    name: sreservice-controller
+    namespace: sre-lab
+roleRef:
+  kind: ClusterRole
+  name: sreservice-controller
+  apiGroup: rbac.authorization.k8s.io
