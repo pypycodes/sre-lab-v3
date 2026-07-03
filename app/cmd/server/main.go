@@ -31,6 +31,7 @@ var (
 		},
 		[]string{"method", "path", "status"},
 	)
+// request duration is a histogram that measures the duration of HTTP requests in seconds, labeled by method and path.
 
 	requestDuration = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
