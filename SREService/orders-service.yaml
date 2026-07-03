@@ -1,0 +1,12 @@
+# orders-service.yaml
+
+apiVersion: demo.ct.com/v1
+kind: SREService
+
+metadata:
+  name: orders
+
+spec:
+  team: payments
+  owner: pavan
+  slo: "99.9"
